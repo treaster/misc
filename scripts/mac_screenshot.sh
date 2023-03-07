@@ -1,23 +1,28 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # for testing, replace 'adb' with 'echo'
-screenshot() {
-  if [ -z $1+x ];
-  then SCREENSHOTBASE=screen;
-  else SCREENSHOTBASE=$1;
-  fi;
-  if [ -z ${SCREENSHOTCOUNTER+x} ];
-  then SCREENSHOTCOUNTER=1;
-  fi;
+# cmd=adb
+cmd=echo  # uncomment for testing
 
-  export SCREENSHOTNAME=$SCREENSHOTBASE$(printf "%05d.png" $SCREENSHOTCOUNTER);
-  adb shell screencap -p /sdcard/${SCREENSHOTNAME} && \
-    adb pull /sdcard/${SCREENSHOTNAME} && \
-    adb shell rm /sdcard/${SCREENSHOTNAME} && \
-    ((SCREENSHOTCOUNTER+=1));
-}
+screenshot_base=screen
+if [ $# -gt 1 ]; then
+    screenshot_base=$1; shift;
+fi
 
-resetscreenshot() {
-  SCREENSHOTCOUNTER=1;
-}
+last=$(find . -name "${screenshot_base}.*" | tail -n 1)
+counter=1
+if [ "${last}" != "" ]; then
+    counter=10
+fi
 
+screenshot_name="${screenshot_base}.$(printf "%05d.png" ${counter})"
+
+"${cmd}" shell screencap -p "/sdcard/${screenshot_name}"
+"${cmd}" pull "/sdcard/${screenshot_name}"
+"${cmd}" shell rm "/sdcard/${screenshot_name}"
+
+if [ "${cmd}" == "echo" ]; then
+    touch "${screenshot_name}"
+fi
