@@ -2,9 +2,8 @@
 
 set -euo pipefail
 
-# for testing, replace 'adb' with 'echo'
-# cmd=adb
-cmd=echo  # uncomment for testing
+cmd=adb
+# cmd=echo  # uncomment for testing
 
 screenshot_base=screen
 if [ $# -gt 1 ]; then
